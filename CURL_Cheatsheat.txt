@@ -1,0 +1,32 @@
+--retrieve / test
+curl http://localhost:3000
+curl http://localhost:3000/api/customers
+curl http://localhost:3000/api/products
+curl http://localhost:3000/api/orders
+
+--retrieve / test Customers
+curl http://localhost:3000/api/customers
+curl http://localhost:3000/api/Customers/search/John@yahoo.com
+--id is dynamic. You can get it from the previous two calls.
+curl http://localhost:3000/api/customers/{id}
+
+--populate products
+curl -X PUT http://localhost:3000/api/products/{id} -d "{\"id\":\"{id}\",\"stock\":90}" -H "Content-Type: application/json"
+
+--retrieve / test products
+curl http://localhost:3000/api/products
+curl http://localhost:3000/api/Products/search/CHI-001
+curl http://localhost:3000/api/products/{id}
+
+
+--delete product
+curl -X "DELETE" http://localhost:3000/api/products/4
+
+--create order
+curl -X POST -H "Content-Type:application/json" http://localhost:3000/api/orders -d "{\"customerEmail\":\"John@yahoo.com\",\"lineItems\":[{\"code\":\"CHI-001\", \"quantity\": 5}]}"
+curl -X POST -H "Content-Type:application/json" http://localhost:3000/api/orders -d "{\"customerEmail\":\"Peter@yahoo.com\", \"lineItems\":[{\"code\":\"CHI-001\", \"quantity\": 90}]}"
+curl -X POST -H "Content-Type:application/json" http://localhost:3000/api/orders -d "{\"customerEmail\":\"Sam@yahoo.com\", \"lineItems\":[{\"code\":\"CHI-001\",  \"quantity\": 10}]}"
+
+--retrieve / test orders
+curl http://localhost:3000/api/orders
+curl http://localhost:3000/api/orders/{id}
