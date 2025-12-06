@@ -3,9 +3,6 @@ import * as customerService from "../service/customerService.js"
 
 export const router = Router();
 
-// load the test data
-customerService.createSeed();
-
 router.get("/", customerService.getCustomers);
 router.get("/:id", customerService.getCustomer);
 router.get("/search/:email", customerService.getCustomerByEmail);

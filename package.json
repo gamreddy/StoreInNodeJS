@@ -7,11 +7,31 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon server.js",
+    "debug": "set DEBUG=* & nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "body-parser": "^2.2.1",
+    "debug": "^4.4.3",
     "express": "^5.1.0",
+    "mongodb": "^7.0.0",
     "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "**/test/**",
+      "**/docs/**"
+    ],
+    "delay": 2500,
+    "env": {
+      "PORT": 3000,
+      "DEBUG_COLORS": 1,
+      "DB_URL": "mongodb+srv://{user}:{password}@{db}.mongodb.net/?appName={app}",
+      "DB_NAME": "{db}"
+    }
   }
 }

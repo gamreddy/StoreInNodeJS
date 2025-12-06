@@ -1,10 +1,7 @@
-import {v4 as uuidv4} from "uuid";
-
 export class Order{
-    constructor(customerEmail, lineItems){
-        this.id = uuidv4();
+    constructor(customerEmail, status = "PENDING", lineItems){
         this.customerEmail = customerEmail;
-        this.status = "PENDING";
+        this.status = status;
         this.lineItems = lineItems;
     }
 }

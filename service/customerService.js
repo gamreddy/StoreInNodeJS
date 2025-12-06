@@ -1,50 +1,61 @@
 import { Customer } from "../model/customer.js";
-import { seedData } from "../data/seedData.js";
+import { MongoClient, ObjectId } from "mongodb";
+import createDebugMessages from 'debug';
 
-const customerData = [];
+const debug  = createDebugMessages("customerService.js");
+const dbUrl = process.env.DB_URL;
+const dbName = process.env.DB_NAME;
 
-export function createSeed() {
-    customerData.push(...seedData.customers);
-}
-
-export function getCustomers(req, res) {
-    try {
-        const customers = customerData;
-        if (!customers || customers.length === 0) {
-            res.status(404).send("Customers not found");
-        } else {
-            res.send(customers);
-        }
-    } catch (err) {
-        console.log(err);
+async function getCustomers(req, res){
+    let client = new MongoClient(dbUrl);
+    try{
+        const db = client.db(dbName);
+        const customers = await db.collection("customers").find().toArray();
+        res.send(customers);
+    }catch(err){
+        debug(err.stack);
         res.status(500).send(err);
+    }finally{
+        client.close();
     }
 }
 
-export function getCustomer(req, res) {
-    try {
-        const customer = customerData.find(p => p.id === req.params.id);
+async function getCustomer(req, res){
+    const id = req.params.id;
+    let client = new MongoClient(dbUrl);    
+    try{
+        const db = client.db(dbName);
+        const customer = await db.collection("customers").findOne({_id: new ObjectId(id)});
         if (!customer) {
             res.status(404).send("Customer not found.");
         } else {
             res.send(customer);
         }
-    } catch (err) {
-        console.log(err);
+    }catch(err){
+        debug(err.stack);
         res.status(500).send(err);
-    }
+    }finally{
+        client.close();
+    }    
 }
 
-export function getCustomerByEmail(req, res){
-    try {
-        const customer = customerData.find(p => p.email === req.params.email);
+async function getCustomerByEmail(req, res){
+    const email = req.params.email;
+    let client = new MongoClient(dbUrl);    
+    try{        
+        const db = client.db(dbName);
+        const customer = await db.collection("customers").findOne({email: email});
         if (!customer) {
             res.status(404).send("Customer not found.");
         } else {
             res.send(customer);
         }
-    } catch (err) {
-        console.log(err);
+    }catch(err){
+        debug(err.stack);
         res.status(500).send(err);
+    }finally{
+        client.close();
     }        
 }
+
+export { getCustomers, getCustomer, getCustomerByEmail}

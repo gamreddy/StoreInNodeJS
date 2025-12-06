@@ -3,9 +3,6 @@ import * as productService from "../service/productService.js"
 
 export const router = Router();
 
-// load the test data
-productService.createSeed();
-
 router.get("/", productService.getProducts);
 router.get("/:id", productService.getProduct);
 router.get("/search/:code", productService.getProductByCode);

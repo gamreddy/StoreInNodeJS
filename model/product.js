@@ -1,5 +1,3 @@
-import {v4 as uuidv4} from "uuid";
-
 export class Product{
     constructor(code, name, description, price, stock){
         
@@ -11,7 +9,6 @@ export class Product{
             throw new Error("price and stock must be numbers.");
         }
 
-        this.id = uuidv4();
         this.code = code;
         this.name = name;
         this.description = description;

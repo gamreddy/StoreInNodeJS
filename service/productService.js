@@ -1,96 +1,119 @@
+import { MongoClient, ObjectId } from "mongodb";
+import createDebugMessages from 'debug';
 import { Product } from "../model/product.js";
-import { seedData } from "../data/seedData.js";
 
-const productData = [];
+const debug  = createDebugMessages("productService.js");
+const dbUrl = process.env.DB_URL;
+const dbName = process.env.DB_NAME;
 
-function createSeed() {
-    productData.push(...seedData.products);
-}
-
-function createProduct(req, res) {
-    try {
-        const product = new Product(req.body.code, req.body.name, req.body.description, req.body.price, req.body.stock);
-        productData.push(product);
+async function createProduct(req, res){
+    let client = new MongoClient(dbUrl);
+    try{
+        const db = client.db(dbName);
+        //const product = await db.collection("products").insertOne({...req.body});
+        const product = await db.collection("products")
+            .insertOne(new Product(req.body.code, req.body.name, req.body.description, req.body.price, req.body.stock ));        
+        
         res.status(201).send(product);
-    } catch (err) {
+    }catch(err){
+        debug(err.stack);
         res.status(500).send(err);
-    }
-}
-
-function getProducts(req, res) {
-    try {
-        const products = productData;
-        if (!products || products.length === 0) {
-            res.status(404).send("Products not found");
-        } else {
-            res.send(products);
-        }
-    } catch (err) {
-        console.log(err);
-        res.status(500).send(err);
-    }
-}
-
-function getProduct(req, res) {
-    try {
-        //console.log(productData);
-        const product = productData.find(p => p.id === req.params.id);
-        if (!product) {
-            res.status(404).send("Product not found.");
-        } else {
-            res.send(product);
-        }
-    } catch (err) {
-        console.log(err);
-        res.status(500).send(err);
-    }
-}
-
-function getProductByCode(req, res){
-    try {
-        //console.log(productData);
-        const product = productData.find(p => p.code === req.params.code);
-        if (!product) {
-            res.status(404).send("Product not found.");
-        } else {
-            res.send(product);
-        }
-    } catch (err) {
-        console.log(err);
-        res.status(500).send(err);
+    }finally{
+        client.close();
     }    
 }
 
-function deleteProduct(req, res){
-    try {
-        //console.log(productData);
-        const index = productData.findIndex(p => p.id === req.params.id);
-        if (index !== -1) {
-            productData.splice(index, 1);
+async function getProducts(req, res){
+    let client = new MongoClient(dbUrl);
+    try{
+        const db = client.db(dbName);
+        const products = await db.collection("products").find().toArray();
+        res.send(products);
+    }catch(err){
+        debug(err.stack);
+        res.status(500).send(err);
+    }finally{
+        client.close();
+    }
+}
+
+async function getProduct(req, res){
+    const id = req.params.id;
+    let client = new MongoClient(dbUrl);    
+    try{
+        const db = client.db(dbName);
+        const product = await db.collection("products").findOne({_id: new ObjectId(id)});
+        if (!product) {
+            res.status(404).send("Product not found.");
+        } else {
+            res.send(product);
+        }
+    }catch(err){
+        debug(err.stack);
+        res.status(500).send(err);
+    }finally{
+        client.close();
+    }    
+}
+
+async function getProductByCode(req, res){
+    const code = req.params.code;
+    let client = new MongoClient(dbUrl);    
+    try{        
+        const db = client.db(dbName);
+        const product = await db.collection("products").findOne({code: code});
+        if (!product) {
+            res.status(404).send("Product not found.");
+        } else {
+            res.send(product);
+        }
+    }catch(err){
+        debug(err.stack);
+        res.status(500).send(err);
+    }finally{
+        client.close();
+    }        
+}
+
+async function deleteProduct(req, res){
+    const id = req.params.id;
+    let client = new MongoClient(dbUrl);    
+    try{
+        const db = client.db(dbName);
+        const result = await db.collection("products").deleteOne({_id: new ObjectId(id)});
+        if(result.deletedCount){
             res.status(204).send();
-        } else {
+        }else{
             res.status(404).send("Product not found.");
         }
-    } catch (err) {
-        console.log(err);
+        
+    }catch(err){
+        debug(err.stack);
         res.status(500).send(err);
-    }
+    }finally{
+        client.close();
+    }        
 }
 
-function updateProduct(req, res){
-    try {
-        //console.log(req.body);
-        const index = productData.findIndex(p => p.id === req.params.id);
-        if (index !== -1) {
-            productData[index] = {...productData[index], ...req.body};
-            res.send(productData[index]);
-        } else {
-            res.status(404).send("Product not found.");
-        }
-    } catch (err) {
-        console.log(err);
+async function updateProduct(req, res){
+    const id = req.params.id;
+    let client = new MongoClient(dbUrl);    
+    try{
+        const db = client.db(dbName);
+        const product = await db.collection("products").findOneAndUpdate(
+            {id: new ObjectId(id)}, 
+            {                
+                $set: {
+                    ...req.body
+                },                
+            });
+        res.send(product);
+    }catch(err){
+        debug(err.stack);
         res.status(500).send(err);
-    }
+    }finally{
+        client.close();
+    }    
 }
 
-export { createSeed, createProduct, getProducts, getProduct, getProductByCode, deleteProduct, updateProduct }
+export { createProduct, getProducts, getProduct, getProductByCode, deleteProduct, updateProduct }

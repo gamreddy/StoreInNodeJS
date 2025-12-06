@@ -1,7 +1,9 @@
 import { app } from './app.js';
+import createDebugMessages from 'debug';
+const debug  = createDebugMessages("server.js");
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
-  console.log(`Store is running on port ${port}`)
+  debug(`Store is running on port ${port}`);
 })

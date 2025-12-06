@@ -1,0 +1,32 @@
+[
+    {
+        "customerEmail": "John@yahoo.com",
+        "status": "PENDING",
+        "lineItems": [
+            {
+                "code": "CHI-001",
+                "quantity": 5
+            }
+        ]
+    },
+    {
+        "customerEmail": "Peter@yahoo.com",
+        "status": "PENDING",
+        "lineItems": [
+            {
+                "code": "CHI-001",
+                "quantity": 90
+            }
+        ]
+    },
+    {
+        "customerEmail": "Sam@yahoo.com",
+        "status": "PENDING",
+        "lineItems": [
+            {
+                "code": "CHI-001",
+                "quantity": 10
+            }
+        ]
+    }
+]
